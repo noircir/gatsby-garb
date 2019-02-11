@@ -10,6 +10,7 @@ const path = require('path');
 const { createFilePath } = require('gatsby-source-filesystem');
 
 const PostTemplate = path.resolve('./src/templates/post-template.js');
+const BlogTemplate = path.resolve('./src/templates/blog-template.js');
 
 //============================
 // Create a slug (brunch) 'posts' onto which new posts will be attached.
@@ -57,6 +58,27 @@ exports.createPages = async ({ graphql, actions }) => {
 			component: PostTemplate,
 			context: {
 				slug: post.fields.slug
+			}
+		});
+	});
+
+	posts.forEach((_, index, postsArr) => {
+		const totalPages = postsArr.length;
+		const postsPerPage = 2;
+		const currentPage = index + 1;
+		const isFirstPage = index === 0;
+		const isLastPage = currentPage === totalPages;
+
+		createPage({
+			path: isFirstPage ? '/blog' : `/blog/${currentPage}`,
+			component: BlogTemplate,
+			context: {
+				limits: postsPerPage,
+				skip: index * postsPerPage,
+				isFirstPage,
+				isLastPage,
+				currentPage,
+				totalPages
 			}
 		});
 	});
